@@ -106,7 +106,12 @@ defmodule ResourcePool.Resources do
   end
 
   defp get_host() do
-    "127.0.0.1"
+    # extract ip
+    {:ok, [{inet, _, _} | _]} = :inet.getif()
+
+    inet
+    |> Tuple.to_list()
+    |> Enum.join(".")
   end
 
   defp gen_random_db_name() do
