@@ -1,0 +1,20 @@
+2018-10-15 13:33:13.694 IST [22660] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2018-10-15 13:33:13.694 IST [22660] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2018-10-15 13:33:13.694 IST [22660] LOG:  could not bind IPv6 address "::1": Address already in use
+2018-10-15 13:33:13.694 IST [22660] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2018-10-15 13:33:13.695 IST [22660] WARNING:  could not create listen socket for "localhost"
+2018-10-15 13:33:13.695 IST [22660] FATAL:  could not create any TCP/IP sockets
+2018-10-15 13:33:13.695 IST [22660] LOG:  database system is shut down
+2018-10-15 13:34:05.762 IST [22689] LOG:  listening on IPv4 address "127.0.0.1", port 5433
+2018-10-15 13:34:05.764 IST [22689] LOG:  listening on IPv6 address "::1", port 5433
+2018-10-15 13:34:05.765 IST [22689] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5433"
+2018-10-15 13:34:05.794 IST [22690] LOG:  database system was shut down at 2018-10-15 13:32:52 IST
+2018-10-15 13:34:05.812 IST [22689] LOG:  database system is ready to accept connections
+2018-10-15 13:34:36.755 IST [22722] LOG:  invalid length of startup packet
+2018-10-15 13:34:36.767 IST [22723] LOG:  invalid length of startup packet
+2018-10-15 13:34:36.771 IST [22724] LOG:  invalid length of startup packet
+2018-10-15 13:35:30.378 IST [22689] LOG:  received fast shutdown request
+2018-10-15 13:35:30.381 IST [22689] LOG:  aborting any active transactions
+2018-10-15 13:35:30.387 IST [22689] LOG:  worker process: logical replication launcher (PID 22696) exited with exit code 1
+2018-10-15 13:35:30.388 IST [22691] LOG:  shutting down
+2018-10-15 13:35:30.405 IST [22689] LOG:  database system is shut down

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+../_build/prod/rel/dockup/bin/dockup migrate && ../_build/prod/rel/dockup/bin/dockup foreground
