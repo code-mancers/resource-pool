@@ -11,12 +11,14 @@ defmodule ResourcePoolWeb.DatabaseController do
     render(conn, "index.json", databases: databases)
   end
 
-  def create(conn, _params) do
-    with databases <- Resources.create_resource_bulk() do
-      conn
-      |> put_status(:created)
-      |> render("index.json", databases: databases)
+  def create(conn, %{"callback" => callback}) do
+    Task.start fn ->
+      Resources.create_resource_bulk(callback)
     end
+
+    conn
+    |> put_status(:ok)
+    |> json(:ok)
   end
 
   def show(conn, %{"id" => id}) do

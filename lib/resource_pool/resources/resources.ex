@@ -9,14 +9,39 @@ defmodule ResourcePool.Resources do
 
   alias ResourcePool.Resources.Database
 
-  def create_resource_bulk(nOfResource \\ 5) do
+  require Logger
+
+  def create_resource_bulk(callback, opts \\ []) do
+    nOfResource = opts[:nOfResource] || 1
+
     1..nOfResource
     |> Enum.map(fn _ -> create_resource() end)
     |> Enum.reject(&match?({:error, _}, &1))
-    |> Enum.map(fn {:ok, database} -> database end)
+    |> Enum.map(&format_resource/1)
+    |> send_response(callback)
   end
 
-  def create_resource() do
+  defp format_resource({:ok, database}) do
+    %{
+      external_id: "#{database.id}",
+      value: "#{database.host}:#{database.port}"
+    }
+  end
+
+
+  defp send_response(databases, callback) do
+    IO.puts callback
+    IO.inspect Poison.encode!(%{data: databases})
+
+    opts = [body: Poison.encode!(%{data: databases}),
+            headers: ["Content-Type": "application/json"]]
+    case HTTPotion.post(callback, opts) do
+      %HTTPotion.Response{} = response -> Logger.info("#{inspect response}")
+      %HTTPotion.ErrorResponse{message: msg} -> Logger.error(msg)
+    end
+  end
+
+  defp create_resource() do
     with {:ok, %{record_db: database}} <- do_create_resource() do
       {:ok, database}
     else
@@ -28,6 +53,7 @@ defmodule ResourcePool.Resources do
     Multi.new
     |> prepare_params()
     |> create_postgres_db()
+    |> seed_postgres_db()
     |> record_db()
     |> Repo.transaction()
   end
@@ -64,16 +90,28 @@ defmodule ResourcePool.Resources do
 
   defp create_postgres_db(multi) do
     Multi.run(multi, :create_postgress_db, fn %{prepare_params: params} ->
-      opts = "-h #{params[:host]} -p #{params[:port]}"
-      IO.inspect ["-D", params[:db_path], "-o", opts, "-l", params[:log_path], "start"]
+      opts = "-h 0.0.0.0 -p #{params[:port]}"
 
-      with {_, 0} <- System.cmd("initdb", ["-D", params[:db_path]]),
+      with {_, 0} <- System.cmd("initdb", ["-A", "trust", "-D", params[:db_path]]),
            {_, 0} <- System.cmd("pg_ctl", ["-D", params[:db_path],
              "-o", opts, "-l", params[:log_path], "start"]) do
         {:ok, params}
       else
-        {:error, error} ->
-          IO.puts "some weird error, #{inspect error}"
+        {msg, errcode} ->
+          IO.puts "some weird error, #{msg}, #{errcode}"
+          {:error, "Couldn't create the database"}
+      end
+    end)
+  end
+
+  defp seed_postgres_db(multi) do
+    Multi.run(multi, :seed_postgress_db, fn %{prepare_params: params} ->
+      dump_file = Path.join(["/", "Users", "akash", "Developer", "resource_pool", "dockup_db_dump.sql"])
+      with {_, 0} <- System.cmd("psql", ["-f", dump_file, "-h", "0.0.0.0", "-p", Integer.to_string(params[:port]), "postgres"]) do
+        {:ok, params}
+      else
+        {msg, errcode} ->
+          IO.puts "some weird error, #{msg}, #{errcode}"
           {:error, "Couldn't create the database"}
       end
     end)

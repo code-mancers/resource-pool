@@ -12,7 +12,7 @@ defmodule ResourcePoolWeb.DatabaseView do
 
   def render("database.json", %{database: database}) do
     %{
-      external_id: database.id,
+      external_id: "#{database.id}",
       value: "#{database.host}:#{database.port}"
     }
   end
